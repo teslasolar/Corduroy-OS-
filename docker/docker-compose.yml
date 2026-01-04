@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # Backend API server
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: konomi-api
+    ports:
+      - "3001:3001"  # REST API
+      - "3002:3002"  # WebSocket streaming
+      - "6789:6789"  # Cube mesh
+    environment:
+      - JAX_PLATFORM_NAME=cpu
+      - LOG_LEVEL=INFO
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ../data:/app/data
+      - ../core:/app/core:ro
+      - ../protocol:/app/protocol:ro
+      - ../api:/app/api:ro
+    restart: unless-stopped
+    networks:
+      - konomi-net
+    healthcheck:
+      test: ["CMD", "python", "-c", "import jax; print('OK')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Frontend web server
+  frontend:
+    image: nginx:alpine
+    container_name: konomi-frontend
+    ports:
+      - "3000:80"
+    volumes:
+      - ../frontend:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - api
+    restart: unless-stopped
+    networks:
+      - konomi-net
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+networks:
+  konomi-net:
+    driver: bridge
+
+volumes:
+  data:
+    driver: local

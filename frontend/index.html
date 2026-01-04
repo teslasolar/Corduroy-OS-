@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Konomi Corduroy-OS - XP10 Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tahoma', 'Verdana', sans-serif;
+            background: #5A7ECC;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        #header {
+            background: linear-gradient(to right, #0054E3, #3985E8);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #003CB3;
+        }
+
+        h1 {
+            font-size: 32px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        #container {
+            display: flex;
+            height: calc(100vh - 100px);
+            margin: 10px;
+            gap: 10px;
+        }
+
+        #sidebar {
+            width: 250px;
+            background: #ECE9D8;
+            border: 2px outset #fff;
+            padding: 10px;
+            color: #000;
+            overflow-y: auto;
+        }
+
+        #main-panel {
+            flex: 1;
+            background: #fff;
+            border: 2px inset #ccc;
+            padding: 0;
+            position: relative;
+        }
+
+        #v86-screen {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .panel-section {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .panel-section h3 {
+            font-size: 14px;
+            color: #003CB3;
+            margin-bottom: 8px;
+        }
+
+        button {
+            background: linear-gradient(to bottom, #fff 0%, #ECE9D8 100%);
+            border: 1px outset #fff;
+            padding: 5px 15px;
+            cursor: pointer;
+            margin: 2px;
+            font-size: 11px;
+        }
+
+        button:active {
+            border-style: inset;
+        }
+
+        button:hover {
+            background: linear-gradient(to bottom, #fff 0%, #d4d0c8 100%);
+        }
+
+        #status {
+            background: #D4D0C8;
+            padding: 5px;
+            font-size: 11px;
+            color: #000;
+            border-top: 2px outset #fff;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .status-online { background: #0f0; }
+        .status-offline { background: #f00; }
+
+        #log {
+            height: 150px;
+            overflow-y: auto;
+            background: #fff;
+            border: 1px inset #ccc;
+            padding: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <h1>🪟 Konomi Corduroy-OS</h1>
+        <div class="subtitle">XP10 Hybrid Interface | v86 Virtual Machine</div>
+    </div>
+
+    <div id="container">
+        <div id="sidebar">
+            <div class="panel-section">
+                <h3>🎲 Cube Control</h3>
+                <button onclick="initCube()">Initialize Cube</button>
+                <button onclick="cubeStatus()">Status</button>
+                <button onclick="connectVertices()">Connect NEU-SWD</button>
+            </div>
+
+            <div class="panel-section">
+                <h3>🧊 BlockArray</h3>
+                <button onclick="createBlock()">Create Block</button>
+                <button onclick="queryLLM()">Query LLM</button>
+                <button onclick="setBlockValue()">Set Value</button>
+            </div>
+
+            <div class="panel-section">
+                <h3>⚡ eVGPU</h3>
+                <button onclick="tensorOp()">Matrix Multiply</button>
+                <button onclick="evgpuInfo()">Info</button>
+            </div>
+
+            <div class="panel-section">
+                <h3>🖥️ v86 VM</h3>
+                <button onclick="bootVM()" id="bootBtn">Boot XP10</button>
+                <button onclick="saveState()">Save State</button>
+                <button onclick="restoreState()">Restore State</button>
+            </div>
+
+            <div class="panel-section">
+                <h3>📊 System Log</h3>
+                <div id="log"></div>
+            </div>
+        </div>
+
+        <div id="main-panel">
+            <div id="v86-screen">
+                <div style="text-align: center;">
+                    <h2>🪟 Konomi Corduroy-OS XP10</h2>
+                    <p style="margin-top: 10px;">v86 Virtual Machine</p>
+                    <p style="margin-top: 20px; font-size: 12px;">Click "Boot XP10" to start</p>
+                    <p style="margin-top: 5px; font-size: 10px; opacity: 0.7;">
+                        Custom NT kernel | Luna theme | Windows XP feel with Windows 10 security
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="status">
+        <span class="status-indicator status-offline" id="statusIndicator"></span>
+        <span id="statusText">Disconnected from backend</span>
+        <span style="float: right;">Konomi Corduroy-OS | Port 3002</span>
+    </div>
+
+    <script src="agent_client.js"></script>
+    <script src="v86_wrapper.js"></script>
+
+    <script>
+        // Simple demo functions (backend integration TBD)
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${timestamp}] ${message}<br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function initCube() {
+            log('Initializing Cube...');
+            // TODO: Send WebSocket message
+            setTimeout(() => log('✓ Cube initialized: 9 nodes active'), 500);
+        }
+
+        function cubeStatus() {
+            log('Requesting Cube status...');
+            setTimeout(() => log('✓ Cube: 9 nodes, 24 edges, 0 messages'), 500);
+        }
+
+        function connectVertices() {
+            log('Connecting NEU to SWD...');
+            setTimeout(() => log('✓ Edge created: NEU ↔ SWD'), 500);
+        }
+
+        function createBlock() {
+            log('Creating BlockArray (10x10x10)...');
+            setTimeout(() => log('✓ Block created: 1000 cells capacity'), 500);
+        }
+
+        function queryLLM() {
+            log('Querying Femto LLM at (0,0,0)...');
+            setTimeout(() => log('✓ Response: [Hello from Konomi]'), 500);
+        }
+
+        function setBlockValue() {
+            log('Setting value at (5,5,5) = 42.0...');
+            setTimeout(() => log('✓ Value set successfully'), 500);
+        }
+
+        function tensorOp() {
+            log('Executing matmul on eVGPU...');
+            setTimeout(() => log('✓ Result shape: (4, 4) | Time: 0.08s'), 500);
+        }
+
+        function evgpuInfo() {
+            log('Getting eVGPU info...');
+            setTimeout(() => log('✓ Platform: CPU | JAX version: 0.4.20'), 500);
+        }
+
+        function bootVM() {
+            log('Booting v86 virtual machine...');
+            document.getElementById('bootBtn').disabled = true;
+            setTimeout(() => {
+                log('✓ v86 initialized');
+                log('⚠ Full v86 integration pending - see v86_wrapper.js');
+            }, 1000);
+        }
+
+        function saveState() {
+            log('Saving VM state...');
+            setTimeout(() => log('✓ State saved to storage'), 500);
+        }
+
+        function restoreState() {
+            log('Restoring VM state...');
+            setTimeout(() => log('✓ State restored'), 500);
+        }
+
+        // Connection status simulation
+        setTimeout(() => {
+            document.getElementById('statusIndicator').className = 'status-indicator status-online';
+            document.getElementById('statusText').textContent = 'Connected to backend';
+            log('🎉 Konomi Corduroy-OS loaded');
+        }, 1000);
+    </script>
+</body>
+</html>
