@@ -1,0 +1,39 @@
+# BlockContext Instance
+# ISA-95 Layer 2 Composite
+# Full block state with bounds and memory
+
+BlockContext:
+  metadata:
+    dims: (100, 100, 100)
+    capacity: 1000000
+    active_cells: 1500
+    active_llms: 25
+    active_cubes: 3
+  bounds:
+    x_min: 5
+    x_max: 95
+    y_min: 10
+    y_max: 80
+    z_min: 0
+    z_max: 99
+  memory:
+    cells_mb: 0.143
+    llms_mb: 0.024
+    cubes_mb: 0.026
+    total_mb: 0.193
+
+# Python instantiation:
+# from konomi_types import BlockMetadata, RegionBounds, MemoryEstimate
+# from konomi_types.composites import BlockContext
+#
+# ctx = BlockContext(
+#     metadata=BlockMetadata(
+#         dims=(100, 100, 100),
+#         capacity=1000000,
+#         active_cells=1500,
+#         active_llms=25,
+#         active_cubes=3
+#     ),
+#     bounds=RegionBounds(5, 95, 10, 80, 0, 99),
+#     memory=MemoryEstimate(0.143, 0.024, 0.026, 0.193)
+# )

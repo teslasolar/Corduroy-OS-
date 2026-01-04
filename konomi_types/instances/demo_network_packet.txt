@@ -1,0 +1,37 @@
+# NetworkPacket Instance
+# ISA-95 Layer 2 Composite
+# Complete packet with header, session, dtype
+
+NetworkPacket:
+  header:
+    opcode: 16  # TENSOR_OP (0x10)
+    payload_len: 256
+    seq: 42
+    crc: 41969  # 0xA3F1
+    flags: 0
+  session:
+    seq: 42
+    connected: true
+    last_ack: 41
+  dtype: FLOAT32  # 0x01
+
+# Context:
+# - Sending 256 bytes of FLOAT32 tensor data
+# - Sequence number 42, expecting ACK for 41
+# - No flags set (uncompressed, unencrypted)
+
+# Python instantiation:
+# from konomi_types.composites import NetworkPacket
+# from konomi_types import PacketHeader, SessionState, DTypeCode
+#
+# packet = NetworkPacket(
+#     header=PacketHeader(0x10, 256, 42, 0xA3F1, 0),
+#     session=SessionState(42, True, 41),
+#     dtype=DTypeCode.FLOAT32
+# )
+#
+# # Or use factory:
+# packet = NetworkPacket.create(
+#     opcode=0x10, payload_len=256, seq=42,
+#     crc=0xA3F1, flags=0, connected=True
+# )

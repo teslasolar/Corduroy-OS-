@@ -1,0 +1,47 @@
+# CubeGraph Instance
+# ISA-95 Layer 2 Composite
+# Cube status with message history
+
+CubeGraph:
+  status:
+    vertices: 8
+    central: 1
+    total_nodes: 9
+    total_edges: 20
+    messages_sent: 3
+    active_llms: 9
+    edge_list:
+      NEU: [NED, NWU, SEU, central]
+      NED: [NEU, NWD, SED, central]
+      NWU: [NEU, NWD, SWU, central]
+      NWD: [NED, NWU, SWD, central]
+      SEU: [NEU, SED, SWU, central]
+      SED: [NED, SEU, SWD, central]
+      SWU: [NWU, SEU, SWD, central]
+      SWD: [NWD, SED, SWU, central]
+      central: [NEU, NED, NWU, NWD, SEU, SED, SWU, SWD]
+  messages:
+    - from_vertex: NEU
+      to_vertex: central
+      message: "query_status"
+      response: "[query_status]"
+    - from_vertex: central
+      to_vertex: SWD
+      message: "relay_command"
+      response: "[relay_command]"
+    - from_vertex: NED
+      to_vertex: SEU
+      message: "sync_weights"
+      response: "[sync_weights]"
+
+# Python instantiation:
+# from konomi_types.composites import CubeGraph
+# from konomi_types import CubeStatus, MessageRecord
+#
+# graph = CubeGraph(
+#     status=CubeStatus(...),
+#     messages=[
+#         MessageRecord("NEU", "central", "query", "[query]"),
+#         MessageRecord("central", "SWD", "relay", "[relay]"),
+#     ]
+# )

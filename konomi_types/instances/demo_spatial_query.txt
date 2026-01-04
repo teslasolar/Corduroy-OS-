@@ -1,0 +1,43 @@
+# SpatialQuery Instance
+# ISA-95 Layer 2 Composite
+# Query with origin, range, and result
+
+SpatialQuery:
+  origin: (50, 50, 50)
+  range:
+    x_range: [0, 100]
+    y_range: [0, 100]
+    z_range: [0, 100]
+  result:
+    dims: (100, 100, 100)
+    capacity: 1000000
+    active_cells: 42
+    active_llms: 5
+    active_cubes: 1
+
+# Context:
+# - Querying from center of 100^3 grid
+# - Full grid range search
+# - Found 42 active cells, 5 LLMs, 1 Cube
+
+# Python instantiation:
+# from konomi_types.composites import SpatialQuery
+# from konomi_types import Range3D, BlockMetadata
+#
+# # Create query
+# query = SpatialQuery.create(
+#     origin=(50, 50, 50),
+#     x_range=(0, 100),
+#     y_range=(0, 100),
+#     z_range=(0, 100)
+# )
+#
+# # Attach result
+# result = BlockMetadata(
+#     dims=(100, 100, 100),
+#     capacity=1000000,
+#     active_cells=42,
+#     active_llms=5,
+#     active_cubes=1
+# )
+# query = query.with_result(result)

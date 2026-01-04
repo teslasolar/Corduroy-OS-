@@ -1,8 +1,9 @@
 """
 KONOMI UDT Layer - User Defined Types
-ISA-95 Layer 0-1: Base type definitions
+ISA-95 Layer 0-2: Base and composite type definitions
 """
 
+# Layer 1: Primitives
 from .primitives import (
     Coord3D,
     Dim3D,
@@ -24,25 +25,44 @@ from .protocol_types import (
     PacketHeader,
     SessionState,
     DTypeCode,
+    ServerPorts,
+)
+
+# Layer 2: Composites (nested types)
+from .composites import (
+    BlockContext,
+    CubeGraph,
+    NetworkPacket,
+    SpatialQuery,
+    LLMDeployment,
+    ProtocolSession,
 )
 
 __all__ = [
-    # Primitives
+    # Layer 1: Primitives
     'Coord3D',
     'Dim3D',
     'Range3D',
     'MemoryEstimate',
-    # Block types
+    # Layer 1: Block types
     'BlockMetadata',
     'BlockQuery',
     'RegionBounds',
-    # Cube types
+    # Layer 1: Cube types
     'VertexID',
     'VERTICES',
     'MessageRecord',
     'CubeStatus',
-    # Protocol types
+    # Layer 1: Protocol types
     'PacketHeader',
     'SessionState',
     'DTypeCode',
+    'ServerPorts',
+    # Layer 2: Composites
+    'BlockContext',
+    'CubeGraph',
+    'NetworkPacket',
+    'SpatialQuery',
+    'LLMDeployment',
+    'ProtocolSession',
 ]

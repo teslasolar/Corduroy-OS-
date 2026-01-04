@@ -1,0 +1,47 @@
+# LLMDeployment Instance
+# ISA-95 Layer 2 Composite
+# Femto LLM deployment record
+
+LLMDeployment:
+  location: (50, 50, 50)
+  host_block:
+    dims: (100, 100, 100)
+    capacity: 1000000
+    active_cells: 100
+    active_llms: 10
+    active_cubes: 1
+  host_cube:
+    vertices: 8
+    central: 1
+    total_nodes: 9
+    total_edges: 20
+    messages_sent: 15
+    active_llms: 9
+  memory:
+    cells_mb: 0.0
+    llms_mb: 0.001
+    cubes_mb: 0.0
+    total_mb: 0.001
+
+# Context:
+# - Single Femto LLM at grid center
+# - Part of a 9-node Cube graph
+# - Minimal memory footprint (~1KB)
+
+# Python instantiation:
+# from konomi_types.composites import LLMDeployment
+# from konomi_types import BlockMetadata, CubeStatus, MemoryEstimate
+#
+# # Standalone deployment (no cube)
+# deploy = LLMDeployment.standalone(
+#     location=(50, 50, 50),
+#     block_dims=(100, 100, 100)
+# )
+#
+# # Full deployment with cube
+# deploy = LLMDeployment(
+#     location=(50, 50, 50),
+#     host_block=BlockMetadata(...),
+#     host_cube=CubeStatus(...),
+#     memory=MemoryEstimate(0.0, 0.001, 0.0, 0.001)
+# )
