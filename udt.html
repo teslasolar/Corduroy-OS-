@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UDT Type System - Konomi Corduroy-OS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .subtitle { opacity: 0.9; }
+        nav { margin-top: 20px; }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 8px 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+        }
+        nav a:hover { background: rgba(255,255,255,0.2); }
+        .layer-section {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .layer-section h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 15px;
+        }
+        .type-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .type-card h3 {
+            color: #fff;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .type-card .badge {
+            background: rgba(255,255,255,0.2);
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.7em;
+        }
+        .type-card .fields {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .type-card .field {
+            margin: 3px 0;
+            padding: 3px 0;
+        }
+        .type-card .field-name { color: #a5d6ff; }
+        .type-card .field-type { color: #ffa657; }
+        .type-card .nested { margin-left: 15px; opacity: 0.9; }
+        .type-card .desc {
+            font-size: 0.85em;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+        .hierarchy {
+            font-family: 'Courier New', monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+        footer a { color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>KONOMI UDT Type System</h1>
+            <p class="subtitle">User Defined Types | ISA-95 Layers 1-2 | Language-Agnostic Templates</p>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="frontend/index.html">Dashboard</a>
+                <a href="ARCHITECTURE.md">Architecture</a>
+                <a href="https://github.com/teslasolar/Corduroy-OS-">GitHub</a>
+            </nav>
+        </header>
+
+        <div class="hierarchy">
+<strong>Type Hierarchy</strong>
+
+ISA Layer 2 (Composites) - Types containing types
+├── BlockContext    = BlockMetadata + RegionBounds + MemoryEstimate
+├── CubeGraph       = CubeStatus + List[MessageRecord]
+├── NetworkPacket   = PacketHeader + SessionState + DTypeCode
+├── SpatialQuery    = Coord3D + Range3D + Optional[BlockMetadata]
+├── LLMDeployment   = Coord3D + BlockMetadata + CubeStatus? + MemoryEstimate
+└── ProtocolSession = SessionState + PacketHeader? + ServerPorts
+
+ISA Layer 1 (Primitives) - Base types
+├── Spatial: Coord3D, Dim3D, Range3D, RegionBounds
+├── Block: BlockMetadata, BlockQuery, MemoryEstimate
+├── Cube: VertexID, CubeStatus, MessageRecord
+└── Protocol: PacketHeader, SessionState, DTypeCode, ServerPorts
+        </div>
+
+        <div class="layer-section" id="composites">
+            <h2>Layer 2: Composite Types</h2>
+            <div class="type-grid">
+                <div class="type-card">
+                    <h3>BlockContext <span class="badge">L2</span></h3>
+                    <div class="fields">
+                        <div class="field"><span class="field-name">metadata</span>: <span class="field-type">BlockMetadata</span></div>
+                        <div class="field"><span class="field-name">bounds</span>: <span class="field-type">RegionBounds</span></div>
+                        <div class="field"><span class="field-name">memory</span>: <span class="field-type">MemoryEstimate</span></div>
+                    </div>
+                    <p class="desc">Full block state with metadata, bounds, and memory usage.</p>
+                </div>
+
+                <div class="type-card">
+                    <h3>CubeGraph <span class="badge">L2</span></h3>
+                    <div class="fields">
+                        <div class="field"><span class="field-name">status</span>: <span class="field-type">CubeStatus</span></div>
+                        <div class="field"><span class="field-name">messages</span>: <span class="field-type">List[MessageRecord]</span></div>
+                    </div>
+                    <p class="desc">Cube status with complete message history for audit trails.</p>
+                </div>
+
+                <div class="type-card">
+                    <h3>NetworkPacket <span class="badge">L2</span></h3>
+                    <div class="fields">
+                        <div class="field"><span class="field-name">header</span>: <span class="field-type">PacketHeader</span></div>
+                        <div class="field"><span class="field-name">session</span>: <span class="field-type">SessionState</span></div>
+                        <div class="field"><span class="field-name">dtype</span>: <span class="field-type">DTypeCode</span></div>
+                    </div>
+                    <p class="desc">Complete packet with header, session context, and data type.</p>
+                </div>
+
+                <div class="type-card">
+                    <h3>SpatialQuery <span class="badge">L2</span></h3>
+                    <div class="fields">
+                        <div class="field"><span class="field-name">origin</span>: <span class="field-type">Coord3D</span></div>
+                        <div class="field"><span class="field-name">range</span>: <span class="field-type">Range3D</span></div>
+                        <div class="field"><span class="field-name">result</span>: <span class="field-type">Optional[BlockMetadata]</span></div>
+                    </div>
+                    <p class="desc">Spatial query combining origin, range, and result.</p>
+                </div>
+
+                <div class="type-card">
+                    <h3>LLMDeployment <span class="badge">L2</span></h3>
+                    <div class="fields">
+                        <div class="field"><span class="field-name">location</span>: <span class="field-type">Coord3D</span></div>
+                        <div class="field"><span class="field-name">host_block</span>: <span class="field-type">BlockMetadata</span></div>
+                        <div class="field"><span class="field-name">host_cube</span>: <span class="field-type">Optional[CubeStatus]</span></div>
+                        <div class="field"><span class="field-name">memory</span>: <span class="field-type">MemoryEstimate</span></div>
+                    </div>
+                    <p class="desc">Femto LLM deployment record with location and resources.</p>
+                </div>
+
+                <div class="type-card">
+                    <h3>ProtocolSession <span class="badge">L2</span></h3>
+                    <div class="fields">
+                        <div class="field"><span class="field-name">state</span>: <span class="field-type">SessionState</span></div>
+                        <div class="field"><span class="field-name">last_header</span>: <span class="field-type">Optional[PacketHeader]</span></div>
+                        <div class="field"><span class="field-name">ports</span>: <span class="field-type">ServerPorts</span></div>
+                    </div>
+                    <p class="desc">Full protocol session state with connection info.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="layer-section" id="primitives">
+            <h2>Layer 1: Primitive Types</h2>
+            <div class="type-grid">
+                <div class="type-card">
+                    <h3>Coord3D <span class="badge">L1</span></h3>
+                    <div class="fields">
+                        <div class="field"><span class="field-name">x, y, z</span>: <span class="field-type">int</span></div>
+                    </div>
+                    <p class="desc">3D coordinate tuple for spatial positioning.</p>
+                </div>
+
+                <div class="type-card">
+                    <h3>Range3D <span class="badge">L1</span></h3>
+                    <div class="fields">
+                        <div class="field"><span class="field-name">x_range</span>: <span class="field-type">Tuple[int, int]</span></div>
+                        <div class="field"><span class="field-name">y_range</span>: <span class="field-type">Tuple[int, int]</span></div>
+                        <div class="field"><span class="field-name">z_range</span>: <span class="field-type">Tuple[int, int]</span></div>
+                    </div>
+                    <p class="desc">3D region bounds for spatial queries.</p>
+                </div>
+
+                <div class="type-card">
+                    <h3>MemoryEstimate <span class="badge">L1</span></h3>
+                    <div class="fields">
+                        <div class="field"><span class="field-name">cells_mb</span>: <span class="field-type">float</span></div>
+                        <div class="field"><span class="field-name">llms_mb</span>: <span class="field-type">float</span></div>
+                        <div class="field"><span class="field-name">cubes_mb</span>: <span class="field-type">float</span></div>
+                        <div class="field"><span class="field-name">total_mb</span>: <span class="field-type">float</span></div>
+                    </div>
+                    <p class="desc">Memory usage breakdown in megabytes.</p>
+                </div>
+
+                <div class="type-card">
+                    <h3>BlockMetadata <span class="badge">L1</span></h3>
+                    <div class="fields">
+                        <div class="field"><span class="field-name">dims</span>: <span class="field-type">Dim3D</span></div>
+                        <div class="field"><span class="field-name">capacity</span>: <span class="field-type">int</span></div>
+                        <div class="field"><span class="field-name">active_cells</span>: <span class="field-type">int</span></div>
+                        <div class="field"><span class="field-name">active_llms</span>: <span class="field-type">int</span></div>
+                        <div class="field"><span class="field-name">active_cubes</span>: <span class="field-type">int</span></div>
+                    </div>
+                    <p class="desc">Metadata for a BlockArray instance.</p>
+                </div>
+
+                <div class="type-card">
+                    <h3>CubeStatus <span class="badge">L1</span></h3>
+                    <div class="fields">
+                        <div class="field"><span class="field-name">vertices</span>: <span class="field-type">int</span></div>
+                        <div class="field"><span class="field-name">central</span>: <span class="field-type">int</span></div>
+                        <div class="field"><span class="field-name">total_nodes</span>: <span class="field-type">int</span></div>
+                        <div class="field"><span class="field-name">total_edges</span>: <span class="field-type">int</span></div>
+                        <div class="field"><span class="field-name">messages_sent</span>: <span class="field-type">int</span></div>
+                    </div>
+                    <p class="desc">Status information for a 9-node Cube graph.</p>
+                </div>
+
+                <div class="type-card">
+                    <h3>PacketHeader <span class="badge">L1</span></h3>
+                    <div class="fields">
+                        <div class="field"><span class="field-name">opcode</span>: <span class="field-type">int</span></div>
+                        <div class="field"><span class="field-name">payload_len</span>: <span class="field-type">int</span></div>
+                        <div class="field"><span class="field-name">seq</span>: <span class="field-type">int</span></div>
+                        <div class="field"><span class="field-name">crc</span>: <span class="field-type">int</span></div>
+                        <div class="field"><span class="field-name">flags</span>: <span class="field-type">int</span></div>
+                    </div>
+                    <p class="desc">Binary packet header for 56k dial-up protocol.</p>
+                </div>
+
+                <div class="type-card">
+                    <h3>SessionState <span class="badge">L1</span></h3>
+                    <div class="fields">
+                        <div class="field"><span class="field-name">seq</span>: <span class="field-type">int</span></div>
+                        <div class="field"><span class="field-name">connected</span>: <span class="field-type">bool</span></div>
+                        <div class="field"><span class="field-name">last_ack</span>: <span class="field-type">int</span></div>
+                    </div>
+                    <p class="desc">Connection state for dial-up session.</p>
+                </div>
+
+                <div class="type-card">
+                    <h3>MessageRecord <span class="badge">L1</span></h3>
+                    <div class="fields">
+                        <div class="field"><span class="field-name">from_vertex</span>: <span class="field-type">str</span></div>
+                        <div class="field"><span class="field-name">to_vertex</span>: <span class="field-type">str</span></div>
+                        <div class="field"><span class="field-name">message</span>: <span class="field-type">str</span></div>
+                        <div class="field"><span class="field-name">response</span>: <span class="field-type">str</span></div>
+                    </div>
+                    <p class="desc">Record of inter-node message passing.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><a href="konomi_types/templates/">View Templates (Markdown)</a> | <a href="konomi_types/instances/">View Instances (Text)</a></p>
+            <p style="margin-top:10px">Konomi Corduroy-OS | KONOMI Industrial Standards | ISA-95</p>
+        </footer>
+    </div>
+</body>
+</html>

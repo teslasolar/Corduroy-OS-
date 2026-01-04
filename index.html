@@ -5,12 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Konomi Corduroy-OS - Home</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -19,14 +14,7 @@
             display: flex;
             flex-direction: column;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            flex: 1;
-        }
-
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; flex: 1; }
         header {
             text-align: center;
             padding: 60px 20px;
@@ -34,60 +22,32 @@
             border-radius: 20px;
             margin-bottom: 40px;
         }
-
-        h1 {
-            font-size: 4em;
-            margin-bottom: 10px;
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
-        }
-
-        .subtitle {
-            font-size: 1.3em;
-            opacity: 0.9;
-            margin-bottom: 30px;
-        }
-
-        .tagline {
-            font-style: italic;
-            opacity: 0.8;
-            margin-top: 20px;
-        }
-
+        h1 { font-size: 3.5em; margin-bottom: 10px; text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5); }
+        .subtitle { font-size: 1.2em; opacity: 0.9; margin-bottom: 30px; }
+        .tagline { font-style: italic; opacity: 0.8; margin-top: 20px; }
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
             margin-bottom: 40px;
         }
-
         .card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 15px;
-            padding: 30px;
+            padding: 25px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-
         .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
-
-        .card h2 {
-            font-size: 2em;
-            margin-bottom: 15px;
-        }
-
-        .card p {
-            line-height: 1.6;
-            margin-bottom: 20px;
-            opacity: 0.9;
-        }
-
+        .card h2 { font-size: 1.6em; margin-bottom: 12px; }
+        .card p { line-height: 1.6; margin-bottom: 15px; opacity: 0.9; font-size: 0.95em; }
         .btn {
             display: inline-block;
-            padding: 12px 30px;
+            padding: 10px 25px;
             background: rgba(255, 255, 255, 0.2);
             border: 2px solid #fff;
             border-radius: 25px;
@@ -95,194 +55,182 @@
             text-decoration: none;
             font-weight: bold;
             transition: all 0.3s ease;
+            font-size: 0.9em;
         }
-
-        .btn:hover {
-            background: #fff;
-            color: #667eea;
-            transform: scale(1.05);
-        }
-
-        .btn-primary {
-            background: #fff;
-            color: #667eea;
-        }
-
-        .btn-primary:hover {
-            background: rgba(255, 255, 255, 0.9);
-        }
-
+        .btn:hover { background: #fff; color: #667eea; transform: scale(1.05); }
+        .btn-primary { background: #fff; color: #667eea; }
         .features {
             background: rgba(0, 0, 0, 0.2);
             border-radius: 15px;
-            padding: 40px;
+            padding: 35px;
             margin-bottom: 40px;
         }
-
-        .features h3 {
-            font-size: 2em;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
+        .features h3 { font-size: 1.8em; margin-bottom: 20px; text-align: center; }
         .feature-list {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
         }
-
         .feature-item {
-            padding: 15px;
+            padding: 12px;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
         }
-
-        .feature-item strong {
-            display: block;
-            font-size: 1.2em;
-            margin-bottom: 5px;
+        .feature-item strong { display: block; font-size: 1.1em; margin-bottom: 5px; }
+        .feature-item small { opacity: 0.7; font-size: 0.85em; }
+        .udt-section {
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 15px;
+            padding: 35px;
+            margin-bottom: 40px;
         }
-
+        .udt-section h3 { font-size: 1.8em; margin-bottom: 20px; text-align: center; }
+        .type-hierarchy {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 0.85em;
+            overflow-x: auto;
+        }
         footer {
             text-align: center;
-            padding: 30px;
+            padding: 25px;
             background: rgba(0, 0, 0, 0.3);
             margin-top: 40px;
         }
-
+        footer a { color: #fff; margin: 0 10px; }
         .ascii-art {
             font-family: 'Courier New', monospace;
-            font-size: 0.8em;
+            font-size: 0.75em;
             background: rgba(0, 0, 0, 0.5);
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
             overflow-x: auto;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
-
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5em;
-            }
-
-            .grid {
-                grid-template-columns: 1fr;
-            }
+            h1 { font-size: 2.2em; }
+            .grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🪟 Konomi Corduroy-OS</h1>
-            <p class="subtitle">A hybrid system combining sparse 3D tensor operations,<br>
-            distributed nano-LLMs, and a custom Windows XP-inspired OS kernel</p>
-
+            <h1>Konomi Corduroy-OS</h1>
+            <p class="subtitle">Hybrid 3D tensor ops + distributed nano-LLMs + XP-inspired kernel<br>
+            Built on ISA-95 industrial standards with nested UDT architecture</p>
             <div class="ascii-art">
-         [XP10-HYBRID]────────────────────────┐
-              │                               │
-    ┌─────────┴─────────┐                     │
-    ▼                   ▼                     ▼
-🧊BlockArray[1000³]  🎲Cube[9node]      🪟XP10[NT5↔NT10]
-    │                   │                     │
-    ├─coord→🧠         ├─8vert+1central      ├─UX:Luna
-    ├─sparse storage    ├─edges:defaultdict   ├─Kern:NT10+shim
-    └─face ops:1M       └─ws://6789           └─Spoof:10.0.19041
+ISA-95 Architecture
+├── Layer 2: Composites (BlockContext, CubeGraph, NetworkPacket...)
+├── Layer 1: Primitives (Coord3D, BlockMetadata, CubeStatus...)
+└── Layer 0: Core (Block, Cube, Femto, eVGPU, Protocol)
             </div>
-
             <p class="tagline">"Windows XP vibes, Windows 10 security, tensor operations on every coordinate"</p>
         </header>
 
         <div class="grid">
             <div class="card">
-                <h2>🎮 Try the Demo</h2>
-                <p>Experience the full Konomi Corduroy-OS interface with Windows XP Luna theme, Cube controls, and v86 virtual machine integration.</p>
-                <a href="frontend/index.html" class="btn btn-primary">Launch Frontend →</a>
+                <h2>Launch Frontend</h2>
+                <p>Experience the XP Luna theme interface with Cube controls and v86 VM integration.</p>
+                <a href="frontend/index.html" class="btn btn-primary">Launch</a>
             </div>
-
             <div class="card">
-                <h2>📚 Documentation</h2>
-                <p>Learn about the architecture, nested Cubes in BlockArrays, and the 2-year XP10 kernel development roadmap.</p>
-                <a href="ARCHITECTURE.md" class="btn">Read Architecture →</a>
+                <h2>UDT Types</h2>
+                <p>Browse the nested type system: Layer 1 primitives and Layer 2 composites.</p>
+                <a href="udt.html" class="btn btn-primary">View Types</a>
             </div>
-
             <div class="card">
-                <h2>💻 GitHub Repository</h2>
-                <p>View the source code, contribute, or report issues. Built with JAX, Python, and lots of nostalgia.</p>
-                <a href="https://github.com/anthropics/claude-code" class="btn">View on GitHub →</a>
+                <h2>Architecture</h2>
+                <p>Learn about nested Cubes in BlockArrays and the modular design.</p>
+                <a href="ARCHITECTURE.md" class="btn">Read Docs</a>
+            </div>
+            <div class="card">
+                <h2>GitHub</h2>
+                <p>View source, contribute, or report issues.</p>
+                <a href="https://github.com/teslasolar/Corduroy-OS-" class="btn">Repository</a>
             </div>
         </div>
 
         <div class="features">
-            <h3>✨ Key Features</h3>
+            <h3>Core Components</h3>
             <div class="feature-list">
                 <div class="feature-item">
-                    <strong>⚡ eVGPU</strong>
-                    CPU-only tensor ops using JAX. No GPU required!
+                    <strong>eVGPU</strong>
+                    CPU-only JAX tensor ops<br>
+                    <small>No GPU required</small>
                 </div>
                 <div class="feature-item">
-                    <strong>🧠 Femto LLM</strong>
-                    16d nano LLM with only 256 parameters
+                    <strong>Femto LLM</strong>
+                    16d nano model (256 params)<br>
+                    <small>&lt;1MB per instance</small>
                 </div>
                 <div class="feature-item">
-                    <strong>🧊 BlockArray</strong>
-                    Sparse 3D grid up to 1000³ cells
+                    <strong>BlockArray</strong>
+                    Sparse 3D grid (1000³)<br>
+                    <small>&lt;100MB active regions</small>
                 </div>
                 <div class="feature-item">
-                    <strong>🎲 Nested Cubes</strong>
-                    9-node LLM graphs distributed in 3D space
+                    <strong>Cube Graph</strong>
+                    9-node LLM network<br>
+                    <small>8 vertices + 1 central</small>
                 </div>
                 <div class="feature-item">
-                    <strong>📞 56k Protocol</strong>
-                    Binary protocol inspired by V.90 modems
+                    <strong>56k Protocol</strong>
+                    Binary V.90 inspired<br>
+                    <small>CRC16, 1-4KB packets</small>
                 </div>
                 <div class="feature-item">
-                    <strong>🪟 XP10 Kernel</strong>
-                    Custom NT kernel with Luna theme (planned)
+                    <strong>XP10 Kernel</strong>
+                    Luna UX + NT10 security<br>
+                    <small>Planned: 2-year roadmap</small>
                 </div>
             </div>
         </div>
 
+        <div class="udt-section">
+            <h3>UDT Type Hierarchy</h3>
+            <div class="type-hierarchy">
+<strong>ISA Layer 2 (Composites)</strong> - Types containing types
+├── BlockContext    = BlockMetadata + RegionBounds + MemoryEstimate
+├── CubeGraph       = CubeStatus + List[MessageRecord]
+├── NetworkPacket   = PacketHeader + SessionState + DTypeCode
+├── SpatialQuery    = Coord3D + Range3D + Optional[BlockMetadata]
+├── LLMDeployment   = Coord3D + BlockMetadata + CubeStatus? + MemoryEstimate
+└── ProtocolSession = SessionState + PacketHeader? + ServerPorts
+
+<strong>ISA Layer 1 (Primitives)</strong> - Base types
+├── Spatial: Coord3D, Dim3D, Range3D, RegionBounds
+├── Block: BlockMetadata, BlockQuery, MemoryEstimate
+├── Cube: VertexID, CubeStatus, MessageRecord
+└── Protocol: PacketHeader, SessionState, DTypeCode, ServerPorts
+            </div>
+            <p style="text-align: center; margin-top: 20px;">
+                <a href="udt.html" class="btn">Browse All Types</a>
+                <a href="konomi_types/templates/" class="btn">View Templates</a>
+            </p>
+        </div>
+
         <div class="card" style="text-align: center;">
-            <h2>🚀 Quick Start</h2>
-            <p>Get started with Konomi Corduroy-OS in minutes:</p>
-            <pre style="text-align: left; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px; overflow-x: auto;">
-<code style="color: #fff;">pip install -r requirements.txt
+            <h2>Quick Start</h2>
+            <pre style="text-align: left; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.9em;">
+<code>pip install -r requirements.txt
 python demo_nested.py
 
 # Or with Docker
-cd docker
-docker-compose up -d</code></pre>
+cd docker && docker-compose up -d</code></pre>
         </div>
     </div>
 
     <footer>
-        <p><strong>Konomi Corduroy-OS</strong></p>
-        <p>Built with ❤️ by the Konomi Corduroy-OS Team</p>
+        <p><strong>Konomi Corduroy-OS</strong> | KONOMI Industrial Standards</p>
         <p style="margin-top: 10px; opacity: 0.7;">
-            <a href="README.md" style="color: #fff; margin: 0 10px;">README</a> |
-            <a href="ARCHITECTURE.md" style="color: #fff; margin: 0 10px;">Architecture</a> |
-            <a href="xp10/docs/kernel_plan.md" style="color: #fff; margin: 0 10px;">XP10 Roadmap</a>
+            <a href="README.md">README</a> |
+            <a href="ARCHITECTURE.md">Architecture</a> |
+            <a href="udt.html">UDT Types</a> |
+            <a href="xp10/docs/kernel_plan.md">XP10 Roadmap</a>
         </p>
     </footer>
-
-    <script>
-        console.log(`
-╔══════════════════════════════════════════════════════════╗
-║                                                          ║
-║          🪟 Konomi Corduroy-OS                          ║
-║                                                          ║
-║   Hybrid 3D Tensor + Distributed LLM + XP10 OS          ║
-║                                                          ║
-╚══════════════════════════════════════════════════════════╝
-
-Welcome to Konomi Corduroy-OS!
-
-Try:
-- Frontend: /frontend/index.html
-- Demo: python demo_nested.py
-- Docs: /ARCHITECTURE.md
-        `);
-    </script>
 </body>
 </html>

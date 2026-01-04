@@ -5,271 +5,447 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Konomi Corduroy-OS - XP10 Interface</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Tahoma', 'Verdana', sans-serif;
             background: #5A7ECC;
             color: #fff;
             overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-
-        #header {
-            background: linear-gradient(to right, #0054E3, #3985E8);
-            padding: 20px;
-            text-align: center;
-            border-bottom: 2px solid #003CB3;
-        }
-
-        h1 {
-            font-size: 32px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-
-        .subtitle {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-top: 5px;
-        }
-
         #container {
             display: flex;
-            height: calc(100vh - 100px);
+            flex: 1;
             margin: 10px;
             gap: 10px;
+            overflow: hidden;
         }
-
-        #sidebar {
-            width: 250px;
-            background: #ECE9D8;
-            border: 2px outset #fff;
-            padding: 10px;
-            color: #000;
-            overflow-y: auto;
-        }
-
-        #main-panel {
-            flex: 1;
-            background: #fff;
-            border: 2px inset #ccc;
-            padding: 0;
-            position: relative;
-        }
-
-        #v86-screen {
-            width: 100%;
-            height: 100%;
-            background: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #0f0;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-        }
-
-        .panel-section {
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #ccc;
-        }
-
-        .panel-section h3 {
-            font-size: 14px;
-            color: #003CB3;
-            margin-bottom: 8px;
-        }
-
-        button {
-            background: linear-gradient(to bottom, #fff 0%, #ECE9D8 100%);
-            border: 1px outset #fff;
-            padding: 5px 15px;
-            cursor: pointer;
-            margin: 2px;
-            font-size: 11px;
-        }
-
-        button:active {
-            border-style: inset;
-        }
-
-        button:hover {
-            background: linear-gradient(to bottom, #fff 0%, #d4d0c8 100%);
-        }
-
-        #status {
+        #status-bar {
             background: #D4D0C8;
-            padding: 5px;
+            padding: 5px 10px;
             font-size: 11px;
             color: #000;
             border-top: 2px outset #fff;
-        }
-
-        .status-indicator {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 5px;
-        }
-
-        .status-online { background: #0f0; }
-        .status-offline { background: #f00; }
-
-        #log {
-            height: 150px;
-            overflow-y: auto;
-            background: #fff;
-            border: 1px inset #ccc;
-            padding: 5px;
-            font-family: 'Courier New', monospace;
-            font-size: 10px;
-            color: #000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
     </style>
 </head>
 <body>
-    <div id="header">
-        <h1>🪟 Konomi Corduroy-OS</h1>
-        <div class="subtitle">XP10 Hybrid Interface | v86 Virtual Machine</div>
-    </div>
+    <!-- Load Atomic Components -->
+    <link rel="import" href="atoms/button.html">
+    <link rel="import" href="atoms/indicator.html">
+    <link rel="import" href="atoms/input.html">
+    <link rel="import" href="molecules/panel-section.html">
+    <link rel="import" href="molecules/log-viewer.html">
+    <link rel="import" href="molecules/coord-input.html">
+    <link rel="import" href="organisms/header.html">
+    <link rel="import" href="organisms/sidebar.html">
+    <link rel="import" href="organisms/vm-screen.html">
+    <link rel="import" href="templates/main-layout.html">
 
-    <div id="container">
-        <div id="sidebar">
-            <div class="panel-section">
-                <h3>🎲 Cube Control</h3>
-                <button onclick="initCube()">Initialize Cube</button>
-                <button onclick="cubeStatus()">Status</button>
-                <button onclick="connectVertices()">Connect NEU-SWD</button>
-            </div>
+    <!-- Inline component definitions for browser compatibility -->
+    <template id="xp-button">
+        <style>
+            .xp-button {
+                background: linear-gradient(to bottom, #fff 0%, #ECE9D8 100%);
+                border: 1px outset #fff;
+                padding: 5px 15px;
+                cursor: pointer;
+                font-size: 11px;
+                font-family: 'Tahoma', 'Verdana', sans-serif;
+                margin: 2px;
+            }
+            .xp-button:active { border-style: inset; }
+            .xp-button:hover { background: linear-gradient(to bottom, #fff 0%, #d4d0c8 100%); }
+            .xp-button:disabled { opacity: 0.5; cursor: not-allowed; }
+        </style>
+        <button class="xp-button"><slot></slot></button>
+    </template>
 
-            <div class="panel-section">
-                <h3>🧊 BlockArray</h3>
-                <button onclick="createBlock()">Create Block</button>
-                <button onclick="queryLLM()">Query LLM</button>
-                <button onclick="setBlockValue()">Set Value</button>
-            </div>
+    <template id="status-indicator">
+        <style>
+            .indicator {
+                display: inline-block;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                margin-right: 5px;
+            }
+            .indicator.online { background: #0f0; }
+            .indicator.offline { background: #f00; }
+            .indicator.warning { background: #ff0; }
+            .indicator.busy { background: #00f; animation: pulse 1s infinite; }
+            @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        </style>
+        <span class="indicator offline"></span>
+    </template>
 
-            <div class="panel-section">
-                <h3>⚡ eVGPU</h3>
-                <button onclick="tensorOp()">Matrix Multiply</button>
-                <button onclick="evgpuInfo()">Info</button>
-            </div>
+    <template id="log-viewer">
+        <style>
+            .log-container {
+                height: 150px;
+                overflow-y: auto;
+                background: #fff;
+                border: 1px inset #ccc;
+                padding: 5px;
+                font-family: 'Courier New', monospace;
+                font-size: 10px;
+                color: #000;
+            }
+            .log-entry { margin: 2px 0; }
+            .log-entry.error { color: #f00; }
+            .log-entry.success { color: #080; }
+            .log-entry.warning { color: #880; }
+            .timestamp { color: #666; }
+        </style>
+        <div class="log-container"></div>
+    </template>
 
-            <div class="panel-section">
-                <h3>🖥️ v86 VM</h3>
-                <button onclick="bootVM()" id="bootBtn">Boot XP10</button>
-                <button onclick="saveState()">Save State</button>
-                <button onclick="restoreState()">Restore State</button>
-            </div>
-
-            <div class="panel-section">
-                <h3>📊 System Log</h3>
-                <div id="log"></div>
-            </div>
+    <template id="panel-section">
+        <style>
+            .section {
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #ccc;
+            }
+            .section h3 {
+                font-size: 14px;
+                color: #003CB3;
+                margin-bottom: 8px;
+                cursor: pointer;
+                user-select: none;
+            }
+            .section h3::before { content: '▼ '; font-size: 10px; }
+            .section.collapsed h3::before { content: '▶ '; }
+            .section.collapsed .content { display: none; }
+            .content { padding-left: 5px; }
+        </style>
+        <div class="section">
+            <h3><slot name="title">Section</slot></h3>
+            <div class="content"><slot></slot></div>
         </div>
+    </template>
 
-        <div id="main-panel">
-            <div id="v86-screen">
-                <div style="text-align: center;">
-                    <h2>🪟 Konomi Corduroy-OS XP10</h2>
-                    <p style="margin-top: 10px;">v86 Virtual Machine</p>
-                    <p style="margin-top: 20px; font-size: 12px;">Click "Boot XP10" to start</p>
-                    <p style="margin-top: 5px; font-size: 10px; opacity: 0.7;">
-                        Custom NT kernel | Luna theme | Windows XP feel with Windows 10 security
-                    </p>
+    <template id="konomi-header">
+        <style>
+            .header {
+                background: linear-gradient(to right, #0054E3, #3985E8);
+                padding: 15px 20px;
+                text-align: center;
+                border-bottom: 2px solid #003CB3;
+                color: #fff;
+            }
+            h1 { font-size: 28px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); margin: 0; }
+            .subtitle { font-size: 12px; opacity: 0.9; margin-top: 5px; }
+            nav { margin-top: 10px; }
+            nav a {
+                color: #fff;
+                text-decoration: none;
+                margin: 0 10px;
+                padding: 5px 15px;
+                background: rgba(255,255,255,0.1);
+                border-radius: 3px;
+                font-size: 11px;
+            }
+            nav a:hover { background: rgba(255,255,255,0.2); }
+        </style>
+        <div class="header">
+            <h1><slot name="title">Konomi Corduroy-OS</slot></h1>
+            <div class="subtitle"><slot name="subtitle">XP10 Hybrid Interface</slot></div>
+            <nav>
+                <a href="index.html">Dashboard</a>
+                <a href="pages/udt-browser.html">UDT Types</a>
+                <a href="pages/L2_scada.html">SCADA</a>
+                <a href="../">Home</a>
+            </nav>
+        </div>
+    </template>
+
+    <template id="konomi-sidebar">
+        <style>
+            .sidebar {
+                width: 260px;
+                background: #ECE9D8;
+                border: 2px outset #fff;
+                padding: 10px;
+                color: #000;
+                overflow-y: auto;
+                font-family: 'Tahoma', 'Verdana', sans-serif;
+            }
+        </style>
+        <div class="sidebar"><slot></slot></div>
+    </template>
+
+    <template id="vm-screen">
+        <style>
+            .vm-container {
+                flex: 1;
+                background: #fff;
+                border: 2px inset #ccc;
+                position: relative;
+            }
+            .vm-screen {
+                width: 100%;
+                height: 100%;
+                background: #000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #0f0;
+                font-family: 'Courier New', monospace;
+                font-size: 14px;
+            }
+            .vm-placeholder { text-align: center; }
+            .vm-placeholder h2 { margin-bottom: 10px; }
+            .vm-placeholder .small { font-size: 10px; opacity: 0.7; margin-top: 15px; }
+        </style>
+        <div class="vm-container">
+            <div class="vm-screen">
+                <div class="vm-placeholder">
+                    <h2>Konomi Corduroy-OS XP10</h2>
+                    <p>v86 Virtual Machine</p>
+                    <p style="margin-top:15px">Click "Boot XP10" to start</p>
+                    <p class="small">Custom NT kernel | Luna theme | Windows XP feel</p>
                 </div>
             </div>
         </div>
-    </div>
+    </template>
 
-    <div id="status">
-        <span class="status-indicator status-offline" id="statusIndicator"></span>
-        <span id="statusText">Disconnected from backend</span>
-        <span style="float: right;">Konomi Corduroy-OS | Port 3002</span>
-    </div>
-
-    <script src="agent_client.js"></script>
-    <script src="v86_wrapper.js"></script>
-
+    <!-- Register Web Components -->
     <script>
-        // Simple demo functions (backend integration TBD)
-        function log(message) {
-            const logDiv = document.getElementById('log');
-            const timestamp = new Date().toLocaleTimeString();
-            logDiv.innerHTML += `[${timestamp}] ${message}<br>`;
-            logDiv.scrollTop = logDiv.scrollHeight;
+        // XP Button
+        class XPButton extends HTMLElement {
+            constructor() {
+                super();
+                const template = document.getElementById('xp-button');
+                this.attachShadow({mode: 'open'}).appendChild(template.content.cloneNode(true));
+                this.shadowRoot.querySelector('button').addEventListener('click', () => {
+                    this.dispatchEvent(new CustomEvent('click', {bubbles: true}));
+                });
+            }
         }
+        customElements.define('xp-button', XPButton);
 
-        function initCube() {
-            log('Initializing Cube...');
-            // TODO: Send WebSocket message
-            setTimeout(() => log('✓ Cube initialized: 9 nodes active'), 500);
+        // Status Indicator
+        class StatusIndicator extends HTMLElement {
+            static get observedAttributes() { return ['status']; }
+            constructor() {
+                super();
+                const template = document.getElementById('status-indicator');
+                this.attachShadow({mode: 'open'}).appendChild(template.content.cloneNode(true));
+            }
+            attributeChangedCallback(name, oldVal, newVal) {
+                if (name === 'status') {
+                    this.shadowRoot.querySelector('.indicator').className = `indicator ${newVal}`;
+                }
+            }
         }
+        customElements.define('status-indicator', StatusIndicator);
 
-        function cubeStatus() {
-            log('Requesting Cube status...');
-            setTimeout(() => log('✓ Cube: 9 nodes, 24 edges, 0 messages'), 500);
+        // Log Viewer
+        class LogViewer extends HTMLElement {
+            constructor() {
+                super();
+                const template = document.getElementById('log-viewer');
+                this.attachShadow({mode: 'open'}).appendChild(template.content.cloneNode(true));
+                this._container = this.shadowRoot.querySelector('.log-container');
+            }
+            log(message, type = 'info') {
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                const time = new Date().toLocaleTimeString();
+                entry.innerHTML = `<span class="timestamp">[${time}]</span> ${message}`;
+                this._container.appendChild(entry);
+                this._container.scrollTop = this._container.scrollHeight;
+            }
+            clear() { this._container.innerHTML = ''; }
         }
+        customElements.define('log-viewer', LogViewer);
 
-        function connectVertices() {
-            log('Connecting NEU to SWD...');
-            setTimeout(() => log('✓ Edge created: NEU ↔ SWD'), 500);
+        // Panel Section
+        class PanelSection extends HTMLElement {
+            constructor() {
+                super();
+                const template = document.getElementById('panel-section');
+                this.attachShadow({mode: 'open'}).appendChild(template.content.cloneNode(true));
+                const h3 = this.shadowRoot.querySelector('h3');
+                const section = this.shadowRoot.querySelector('.section');
+                h3.addEventListener('click', () => section.classList.toggle('collapsed'));
+            }
         }
+        customElements.define('panel-section', PanelSection);
 
-        function createBlock() {
-            log('Creating BlockArray (10x10x10)...');
-            setTimeout(() => log('✓ Block created: 1000 cells capacity'), 500);
+        // Konomi Header
+        class KonomiHeader extends HTMLElement {
+            constructor() {
+                super();
+                const template = document.getElementById('konomi-header');
+                this.attachShadow({mode: 'open'}).appendChild(template.content.cloneNode(true));
+            }
         }
+        customElements.define('konomi-header', KonomiHeader);
 
-        function queryLLM() {
-            log('Querying Femto LLM at (0,0,0)...');
-            setTimeout(() => log('✓ Response: [Hello from Konomi]'), 500);
+        // Konomi Sidebar
+        class KonomiSidebar extends HTMLElement {
+            constructor() {
+                super();
+                const template = document.getElementById('konomi-sidebar');
+                this.attachShadow({mode: 'open'}).appendChild(template.content.cloneNode(true));
+            }
         }
+        customElements.define('konomi-sidebar', KonomiSidebar);
 
-        function setBlockValue() {
-            log('Setting value at (5,5,5) = 42.0...');
-            setTimeout(() => log('✓ Value set successfully'), 500);
+        // VM Screen
+        class VMScreen extends HTMLElement {
+            constructor() {
+                super();
+                const template = document.getElementById('vm-screen');
+                this.attachShadow({mode: 'open'}).appendChild(template.content.cloneNode(true));
+            }
         }
+        customElements.define('vm-screen', VMScreen);
+    </script>
 
-        function tensorOp() {
-            log('Executing matmul on eVGPU...');
-            setTimeout(() => log('✓ Result shape: (4, 4) | Time: 0.08s'), 500);
-        }
+    <!-- Page Structure Using Components -->
+    <konomi-header>
+        <span slot="title">Konomi Corduroy-OS</span>
+        <span slot="subtitle">XP10 Hybrid Interface | ISA-95 Layer 2</span>
+    </konomi-header>
 
-        function evgpuInfo() {
-            log('Getting eVGPU info...');
-            setTimeout(() => log('✓ Platform: CPU | JAX version: 0.4.20'), 500);
-        }
+    <div id="container">
+        <konomi-sidebar>
+            <panel-section>
+                <span slot="title">Cube Control</span>
+                <xp-button id="btn-init-cube">Initialize Cube</xp-button>
+                <xp-button id="btn-cube-status">Status</xp-button>
+                <xp-button id="btn-connect">Connect NEU-SWD</xp-button>
+            </panel-section>
 
-        function bootVM() {
-            log('Booting v86 virtual machine...');
-            document.getElementById('bootBtn').disabled = true;
+            <panel-section>
+                <span slot="title">BlockArray</span>
+                <xp-button id="btn-create-block">Create Block</xp-button>
+                <xp-button id="btn-query-llm">Query LLM</xp-button>
+                <xp-button id="btn-set-value">Set Value</xp-button>
+            </panel-section>
+
+            <panel-section>
+                <span slot="title">eVGPU</span>
+                <xp-button id="btn-matmul">Matrix Multiply</xp-button>
+                <xp-button id="btn-evgpu-info">Info</xp-button>
+            </panel-section>
+
+            <panel-section>
+                <span slot="title">UDT Types</span>
+                <xp-button id="btn-view-types">Browse Types</xp-button>
+                <xp-button id="btn-view-composites">Composites</xp-button>
+            </panel-section>
+
+            <panel-section>
+                <span slot="title">v86 VM</span>
+                <xp-button id="btn-boot">Boot XP10</xp-button>
+                <xp-button id="btn-save">Save State</xp-button>
+                <xp-button id="btn-restore">Restore</xp-button>
+            </panel-section>
+
+            <panel-section>
+                <span slot="title">System Log</span>
+                <log-viewer id="log"></log-viewer>
+            </panel-section>
+        </konomi-sidebar>
+
+        <vm-screen id="vm"></vm-screen>
+    </div>
+
+    <div id="status-bar">
+        <div>
+            <status-indicator id="status-led" status="offline"></status-indicator>
+            <span id="status-text">Disconnected</span>
+        </div>
+        <div>Konomi Corduroy-OS | ISA-95 | Port 3002</div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        const log = document.getElementById('log');
+        const statusLed = document.getElementById('status-led');
+        const statusText = document.getElementById('status-text');
+
+        // Event handlers using components
+        document.getElementById('btn-init-cube').addEventListener('click', () => {
+            log.log('Initializing Cube...');
+            setTimeout(() => log.log('Cube initialized: 9 nodes active', 'success'), 500);
+        });
+
+        document.getElementById('btn-cube-status').addEventListener('click', () => {
+            log.log('Requesting Cube status...');
+            setTimeout(() => log.log('Cube: 9 nodes, 24 edges, 0 messages', 'success'), 500);
+        });
+
+        document.getElementById('btn-connect').addEventListener('click', () => {
+            log.log('Connecting NEU to SWD...');
+            setTimeout(() => log.log('Edge created: NEU - SWD', 'success'), 500);
+        });
+
+        document.getElementById('btn-create-block').addEventListener('click', () => {
+            log.log('Creating BlockArray (100x100x100)...');
+            setTimeout(() => log.log('Block created: 1M cell capacity', 'success'), 500);
+        });
+
+        document.getElementById('btn-query-llm').addEventListener('click', () => {
+            log.log('Querying Femto LLM at (50,50,50)...');
+            setTimeout(() => log.log('Response: [Hello from Konomi]', 'success'), 500);
+        });
+
+        document.getElementById('btn-set-value').addEventListener('click', () => {
+            log.log('Setting value at (50,50,50) = 42.0...');
+            setTimeout(() => log.log('Value set successfully', 'success'), 500);
+        });
+
+        document.getElementById('btn-matmul').addEventListener('click', () => {
+            log.log('Executing matmul on eVGPU...');
+            setTimeout(() => log.log('Result: (16,16) in 0.08s', 'success'), 500);
+        });
+
+        document.getElementById('btn-evgpu-info').addEventListener('click', () => {
+            log.log('eVGPU: CPU platform | JAX backend', 'success');
+        });
+
+        document.getElementById('btn-view-types').addEventListener('click', () => {
+            window.location.href = 'pages/udt-browser.html';
+        });
+
+        document.getElementById('btn-view-composites').addEventListener('click', () => {
+            window.location.href = 'pages/udt-browser.html#composites';
+        });
+
+        document.getElementById('btn-boot').addEventListener('click', () => {
+            log.log('Booting v86 virtual machine...');
             setTimeout(() => {
-                log('✓ v86 initialized');
-                log('⚠ Full v86 integration pending - see v86_wrapper.js');
+                log.log('v86 initialized', 'success');
+                log.log('Full v86 integration pending', 'warning');
             }, 1000);
-        }
+        });
 
-        function saveState() {
-            log('Saving VM state...');
-            setTimeout(() => log('✓ State saved to storage'), 500);
-        }
+        document.getElementById('btn-save').addEventListener('click', () => {
+            log.log('Saving VM state...');
+            setTimeout(() => log.log('State saved', 'success'), 500);
+        });
 
-        function restoreState() {
-            log('Restoring VM state...');
-            setTimeout(() => log('✓ State restored'), 500);
-        }
+        document.getElementById('btn-restore').addEventListener('click', () => {
+            log.log('Restoring VM state...');
+            setTimeout(() => log.log('State restored', 'success'), 500);
+        });
 
-        // Connection status simulation
+        // Simulate connection
         setTimeout(() => {
-            document.getElementById('statusIndicator').className = 'status-indicator status-online';
-            document.getElementById('statusText').textContent = 'Connected to backend';
-            log('🎉 Konomi Corduroy-OS loaded');
+            statusLed.setAttribute('status', 'online');
+            statusText.textContent = 'Connected';
+            log.log('Konomi Corduroy-OS loaded', 'success');
+            log.log('ISA-95 Layer 2 composites available', 'info');
         }, 1000);
     </script>
 </body>

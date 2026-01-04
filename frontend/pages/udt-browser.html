@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UDT Type Browser - Konomi Corduroy-OS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Tahoma', 'Verdana', sans-serif;
+            background: #5A7ECC;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        #container {
+            display: flex;
+            flex: 1;
+            margin: 10px;
+            gap: 10px;
+            overflow: hidden;
+        }
+        #status-bar {
+            background: #D4D0C8;
+            padding: 5px 10px;
+            font-size: 11px;
+            color: #000;
+            border-top: 2px outset #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Component Templates -->
+    <template id="xp-button">
+        <style>
+            .xp-button {
+                background: linear-gradient(to bottom, #fff 0%, #ECE9D8 100%);
+                border: 1px outset #fff;
+                padding: 5px 15px;
+                cursor: pointer;
+                font-size: 11px;
+                font-family: 'Tahoma', 'Verdana', sans-serif;
+                margin: 2px;
+            }
+            .xp-button:active { border-style: inset; }
+            .xp-button:hover { background: linear-gradient(to bottom, #fff 0%, #d4d0c8 100%); }
+            .xp-button.active { background: #d4d0c8; border-style: inset; }
+        </style>
+        <button class="xp-button"><slot></slot></button>
+    </template>
+
+    <template id="panel-section">
+        <style>
+            .section {
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #ccc;
+            }
+            .section h3 {
+                font-size: 14px;
+                color: #003CB3;
+                margin-bottom: 8px;
+                cursor: pointer;
+            }
+            .section h3::before { content: '▼ '; font-size: 10px; }
+            .section.collapsed h3::before { content: '▶ '; }
+            .section.collapsed .content { display: none; }
+            .content { padding-left: 5px; }
+        </style>
+        <div class="section">
+            <h3><slot name="title">Section</slot></h3>
+            <div class="content"><slot></slot></div>
+        </div>
+    </template>
+
+    <template id="konomi-header">
+        <style>
+            .header {
+                background: linear-gradient(to right, #0054E3, #3985E8);
+                padding: 15px 20px;
+                text-align: center;
+                border-bottom: 2px solid #003CB3;
+                color: #fff;
+            }
+            h1 { font-size: 28px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); margin: 0; }
+            .subtitle { font-size: 12px; opacity: 0.9; margin-top: 5px; }
+            nav { margin-top: 10px; }
+            nav a {
+                color: #fff;
+                text-decoration: none;
+                margin: 0 10px;
+                padding: 5px 15px;
+                background: rgba(255,255,255,0.1);
+                border-radius: 3px;
+                font-size: 11px;
+            }
+            nav a:hover { background: rgba(255,255,255,0.2); }
+            nav a.active { background: rgba(255,255,255,0.3); }
+        </style>
+        <div class="header">
+            <h1><slot name="title">UDT Type Browser</slot></h1>
+            <div class="subtitle"><slot name="subtitle">ISA-95 Layers 1-2</slot></div>
+            <nav>
+                <a href="../index.html">Dashboard</a>
+                <a href="udt-browser.html" class="active">UDT Types</a>
+                <a href="L2_scada.html">SCADA</a>
+                <a href="../../">Home</a>
+            </nav>
+        </div>
+    </template>
+
+    <template id="konomi-sidebar">
+        <style>
+            .sidebar {
+                width: 220px;
+                background: #ECE9D8;
+                border: 2px outset #fff;
+                padding: 10px;
+                color: #000;
+                overflow-y: auto;
+            }
+        </style>
+        <div class="sidebar"><slot></slot></div>
+    </template>
+
+    <template id="type-card">
+        <style>
+            .card {
+                background: #fff;
+                border: 2px inset #ccc;
+                padding: 15px;
+                margin-bottom: 15px;
+                color: #000;
+            }
+            .card h3 {
+                color: #003CB3;
+                margin-bottom: 10px;
+                font-size: 16px;
+                border-bottom: 1px solid #ccc;
+                padding-bottom: 5px;
+            }
+            .card .layer {
+                display: inline-block;
+                background: #003CB3;
+                color: #fff;
+                padding: 2px 8px;
+                border-radius: 3px;
+                font-size: 10px;
+                margin-left: 10px;
+            }
+            .field {
+                margin: 8px 0;
+                padding: 5px;
+                background: #f5f5f5;
+                border-left: 3px solid #003CB3;
+                font-family: 'Courier New', monospace;
+                font-size: 12px;
+            }
+            .field .name { color: #003CB3; font-weight: bold; }
+            .field .type { color: #666; }
+            .nested { margin-left: 15px; border-left-color: #764ba2; }
+            .desc { font-size: 11px; color: #666; margin-top: 10px; }
+        </style>
+        <div class="card">
+            <h3><slot name="name">TypeName</slot><span class="layer"><slot name="layer">L1</slot></span></h3>
+            <div class="fields"><slot></slot></div>
+            <div class="desc"><slot name="desc"></slot></div>
+        </div>
+    </template>
+
+    <!-- Register Components -->
+    <script>
+        class XPButton extends HTMLElement {
+            constructor() {
+                super();
+                const template = document.getElementById('xp-button');
+                this.attachShadow({mode: 'open'}).appendChild(template.content.cloneNode(true));
+                this.shadowRoot.querySelector('button').addEventListener('click', () => {
+                    this.dispatchEvent(new CustomEvent('click', {bubbles: true}));
+                });
+            }
+            setActive(active) {
+                this.shadowRoot.querySelector('button').classList.toggle('active', active);
+            }
+        }
+        customElements.define('xp-button', XPButton);
+
+        class PanelSection extends HTMLElement {
+            constructor() {
+                super();
+                const template = document.getElementById('panel-section');
+                this.attachShadow({mode: 'open'}).appendChild(template.content.cloneNode(true));
+                const h3 = this.shadowRoot.querySelector('h3');
+                const section = this.shadowRoot.querySelector('.section');
+                h3.addEventListener('click', () => section.classList.toggle('collapsed'));
+            }
+        }
+        customElements.define('panel-section', PanelSection);
+
+        class KonomiHeader extends HTMLElement {
+            constructor() {
+                super();
+                const template = document.getElementById('konomi-header');
+                this.attachShadow({mode: 'open'}).appendChild(template.content.cloneNode(true));
+            }
+        }
+        customElements.define('konomi-header', KonomiHeader);
+
+        class KonomiSidebar extends HTMLElement {
+            constructor() {
+                super();
+                const template = document.getElementById('konomi-sidebar');
+                this.attachShadow({mode: 'open'}).appendChild(template.content.cloneNode(true));
+            }
+        }
+        customElements.define('konomi-sidebar', KonomiSidebar);
+
+        class TypeCard extends HTMLElement {
+            constructor() {
+                super();
+                const template = document.getElementById('type-card');
+                this.attachShadow({mode: 'open'}).appendChild(template.content.cloneNode(true));
+            }
+        }
+        customElements.define('type-card', TypeCard);
+    </script>
+
+    <!-- Page Structure -->
+    <konomi-header>
+        <span slot="title">UDT Type Browser</span>
+        <span slot="subtitle">KONOMI User Defined Types | ISA-95 Layers 1-2</span>
+    </konomi-header>
+
+    <div id="container">
+        <konomi-sidebar>
+            <panel-section>
+                <span slot="title">Layer 2: Composites</span>
+                <xp-button id="btn-BlockContext">BlockContext</xp-button>
+                <xp-button id="btn-CubeGraph">CubeGraph</xp-button>
+                <xp-button id="btn-NetworkPacket">NetworkPacket</xp-button>
+                <xp-button id="btn-SpatialQuery">SpatialQuery</xp-button>
+                <xp-button id="btn-LLMDeployment">LLMDeployment</xp-button>
+                <xp-button id="btn-ProtocolSession">ProtocolSession</xp-button>
+            </panel-section>
+
+            <panel-section>
+                <span slot="title">Layer 1: Primitives</span>
+                <xp-button id="btn-Coord3D">Coord3D</xp-button>
+                <xp-button id="btn-Range3D">Range3D</xp-button>
+                <xp-button id="btn-MemoryEstimate">MemoryEstimate</xp-button>
+                <xp-button id="btn-BlockMetadata">BlockMetadata</xp-button>
+                <xp-button id="btn-RegionBounds">RegionBounds</xp-button>
+                <xp-button id="btn-CubeStatus">CubeStatus</xp-button>
+                <xp-button id="btn-MessageRecord">MessageRecord</xp-button>
+                <xp-button id="btn-PacketHeader">PacketHeader</xp-button>
+                <xp-button id="btn-SessionState">SessionState</xp-button>
+            </panel-section>
+
+            <panel-section>
+                <span slot="title">View All</span>
+                <xp-button id="btn-all-l1">All Layer 1</xp-button>
+                <xp-button id="btn-all-l2">All Layer 2</xp-button>
+                <xp-button id="btn-all">All Types</xp-button>
+            </panel-section>
+        </konomi-sidebar>
+
+        <div id="main-content" style="flex:1; background:#fff; border:2px inset #ccc; padding:15px; overflow-y:auto; color:#000;">
+            <div id="type-display">
+                <!-- Type cards rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <div id="status-bar">
+        KONOMI UDT Browser | 15 Layer 1 types | 6 Layer 2 composites | Templates: konomi_types/templates/
+    </div>
+
+    <script>
+        const typeData = {
+            // Layer 2 Composites
+            BlockContext: {
+                layer: 'L2',
+                desc: 'Full block state with metadata, bounds, and memory usage.',
+                fields: [
+                    { name: 'metadata', type: 'BlockMetadata', nested: true },
+                    { name: 'bounds', type: 'RegionBounds', nested: true },
+                    { name: 'memory', type: 'MemoryEstimate', nested: true }
+                ]
+            },
+            CubeGraph: {
+                layer: 'L2',
+                desc: 'Cube status with complete message history for audit trails.',
+                fields: [
+                    { name: 'status', type: 'CubeStatus', nested: true },
+                    { name: 'messages', type: 'List[MessageRecord]', nested: true }
+                ]
+            },
+            NetworkPacket: {
+                layer: 'L2',
+                desc: 'Complete network packet with header, session context, and data type.',
+                fields: [
+                    { name: 'header', type: 'PacketHeader', nested: true },
+                    { name: 'session', type: 'SessionState', nested: true },
+                    { name: 'dtype', type: 'DTypeCode', nested: true }
+                ]
+            },
+            SpatialQuery: {
+                layer: 'L2',
+                desc: 'Spatial query combining origin, range, and optional result metadata.',
+                fields: [
+                    { name: 'origin', type: 'Coord3D', nested: true },
+                    { name: 'range', type: 'Range3D', nested: true },
+                    { name: 'result', type: 'Optional[BlockMetadata]', nested: true }
+                ]
+            },
+            LLMDeployment: {
+                layer: 'L2',
+                desc: 'Femto LLM deployment record with location, host, and resources.',
+                fields: [
+                    { name: 'location', type: 'Coord3D', nested: true },
+                    { name: 'host_block', type: 'BlockMetadata', nested: true },
+                    { name: 'host_cube', type: 'Optional[CubeStatus]', nested: true },
+                    { name: 'memory', type: 'MemoryEstimate', nested: true }
+                ]
+            },
+            ProtocolSession: {
+                layer: 'L2',
+                desc: 'Full protocol session state with connection info and port config.',
+                fields: [
+                    { name: 'state', type: 'SessionState', nested: true },
+                    { name: 'last_header', type: 'Optional[PacketHeader]', nested: true },
+                    { name: 'ports', type: 'ServerPorts', nested: true }
+                ]
+            },
+            // Layer 1 Primitives
+            Coord3D: {
+                layer: 'L1',
+                desc: '3D coordinate tuple for spatial positioning.',
+                fields: [
+                    { name: 'x', type: 'int' },
+                    { name: 'y', type: 'int' },
+                    { name: 'z', type: 'int' }
+                ]
+            },
+            Range3D: {
+                layer: 'L1',
+                desc: '3D region bounds for spatial queries.',
+                fields: [
+                    { name: 'x_range', type: 'Tuple[int, int]' },
+                    { name: 'y_range', type: 'Tuple[int, int]' },
+                    { name: 'z_range', type: 'Tuple[int, int]' }
+                ]
+            },
+            MemoryEstimate: {
+                layer: 'L1',
+                desc: 'Memory usage breakdown in megabytes.',
+                fields: [
+                    { name: 'cells_mb', type: 'float' },
+                    { name: 'llms_mb', type: 'float' },
+                    { name: 'cubes_mb', type: 'float' },
+                    { name: 'total_mb', type: 'float' }
+                ]
+            },
+            BlockMetadata: {
+                layer: 'L1',
+                desc: 'Metadata for a BlockArray instance.',
+                fields: [
+                    { name: 'dims', type: 'Dim3D' },
+                    { name: 'capacity', type: 'int' },
+                    { name: 'active_cells', type: 'int' },
+                    { name: 'active_llms', type: 'int' },
+                    { name: 'active_cubes', type: 'int' }
+                ]
+            },
+            RegionBounds: {
+                layer: 'L1',
+                desc: 'Min/max bounds for region-based operations.',
+                fields: [
+                    { name: 'x_min', type: 'int' },
+                    { name: 'x_max', type: 'int' },
+                    { name: 'y_min', type: 'int' },
+                    { name: 'y_max', type: 'int' },
+                    { name: 'z_min', type: 'int' },
+                    { name: 'z_max', type: 'int' }
+                ]
+            },
+            CubeStatus: {
+                layer: 'L1',
+                desc: 'Status information for a 9-node Cube graph.',
+                fields: [
+                    { name: 'vertices', type: 'int' },
+                    { name: 'central', type: 'int' },
+                    { name: 'total_nodes', type: 'int' },
+                    { name: 'total_edges', type: 'int' },
+                    { name: 'messages_sent', type: 'int' },
+                    { name: 'active_llms', type: 'int' },
+                    { name: 'edge_list', type: 'Dict[str, List[str]]' }
+                ]
+            },
+            MessageRecord: {
+                layer: 'L1',
+                desc: 'Record of inter-node message passing.',
+                fields: [
+                    { name: 'from_vertex', type: 'str' },
+                    { name: 'to_vertex', type: 'str' },
+                    { name: 'message', type: 'str' },
+                    { name: 'response', type: 'str' }
+                ]
+            },
+            PacketHeader: {
+                layer: 'L1',
+                desc: 'Binary packet header for 56k dial-up protocol.',
+                fields: [
+                    { name: 'opcode', type: 'int' },
+                    { name: 'payload_len', type: 'int' },
+                    { name: 'seq', type: 'int' },
+                    { name: 'crc', type: 'int' },
+                    { name: 'flags', type: 'int' }
+                ]
+            },
+            SessionState: {
+                layer: 'L1',
+                desc: 'Connection state for dial-up session.',
+                fields: [
+                    { name: 'seq', type: 'int' },
+                    { name: 'connected', type: 'bool' },
+                    { name: 'last_ack', type: 'int' }
+                ]
+            }
+        };
+
+        function renderType(name) {
+            const data = typeData[name];
+            if (!data) return '';
+
+            let fieldsHtml = data.fields.map(f =>
+                `<div class="field${f.nested ? ' nested' : ''}">
+                    <span class="name">${f.name}</span>: <span class="type">${f.type}</span>
+                </div>`
+            ).join('');
+
+            return `
+                <type-card>
+                    <span slot="name">${name}</span>
+                    <span slot="layer">${data.layer}</span>
+                    ${fieldsHtml}
+                    <span slot="desc">${data.desc}</span>
+                </type-card>
+            `;
+        }
+
+        function showTypes(types) {
+            document.getElementById('type-display').innerHTML = types.map(renderType).join('');
+        }
+
+        // Wire up buttons
+        Object.keys(typeData).forEach(name => {
+            const btn = document.getElementById(`btn-${name}`);
+            if (btn) {
+                btn.addEventListener('click', () => showTypes([name]));
+            }
+        });
+
+        document.getElementById('btn-all-l1').addEventListener('click', () => {
+            showTypes(Object.keys(typeData).filter(k => typeData[k].layer === 'L1'));
+        });
+
+        document.getElementById('btn-all-l2').addEventListener('click', () => {
+            showTypes(Object.keys(typeData).filter(k => typeData[k].layer === 'L2'));
+        });
+
+        document.getElementById('btn-all').addEventListener('click', () => {
+            showTypes(Object.keys(typeData));
+        });
+
+        // Check for hash on load
+        if (window.location.hash === '#composites') {
+            showTypes(Object.keys(typeData).filter(k => typeData[k].layer === 'L2'));
+        } else {
+            showTypes(Object.keys(typeData));
+        }
+    </script>
+</body>
+</html>
