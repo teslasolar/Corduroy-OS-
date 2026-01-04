@@ -1,0 +1,57 @@
+<!--
+KONOMI Atomic Design - Panel Section Molecule
+ISA-101 Level 2: Collapsible panel section
+-->
+<template id="panel-section">
+  <style>
+    .section {
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+    .section h3 {
+      font-size: 14px;
+      color: #003CB3;
+      margin-bottom: 8px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .section h3::before {
+      content: '▼ ';
+      font-size: 10px;
+    }
+    .section.collapsed h3::before {
+      content: '▶ ';
+    }
+    .section.collapsed .content {
+      display: none;
+    }
+    .content {
+      padding-left: 10px;
+    }
+  </style>
+  <div class="section">
+    <h3><slot name="title">Section</slot></h3>
+    <div class="content">
+      <slot></slot>
+    </div>
+  </div>
+</template>
+
+<script>
+class PanelSection extends HTMLElement {
+  constructor() {
+    super();
+    const template = document.getElementById('panel-section');
+    const shadow = this.attachShadow({mode: 'open'});
+    shadow.appendChild(template.content.cloneNode(true));
+
+    const h3 = shadow.querySelector('h3');
+    const section = shadow.querySelector('.section');
+    h3.addEventListener('click', () => {
+      section.classList.toggle('collapsed');
+    });
+  }
+}
+customElements.define('panel-section', PanelSection);
+</script>

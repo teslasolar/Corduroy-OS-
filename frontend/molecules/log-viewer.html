@@ -1,0 +1,54 @@
+<!--
+KONOMI Atomic Design - Log Viewer Molecule
+ISA-101 Level 2: System log display
+-->
+<template id="log-viewer">
+  <style>
+    .log-container {
+      height: 150px;
+      overflow-y: auto;
+      background: #fff;
+      border: 1px inset #ccc;
+      padding: 5px;
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      color: #000;
+    }
+    .log-entry {
+      margin: 2px 0;
+    }
+    .log-entry.error { color: #f00; }
+    .log-entry.success { color: #080; }
+    .log-entry.warning { color: #880; }
+    .timestamp {
+      color: #666;
+    }
+  </style>
+  <div class="log-container"></div>
+</template>
+
+<script>
+class LogViewer extends HTMLElement {
+  constructor() {
+    super();
+    const template = document.getElementById('log-viewer');
+    const shadow = this.attachShadow({mode: 'open'});
+    shadow.appendChild(template.content.cloneNode(true));
+    this._container = shadow.querySelector('.log-container');
+  }
+
+  log(message, type = 'info') {
+    const entry = document.createElement('div');
+    entry.className = `log-entry ${type}`;
+    const time = new Date().toLocaleTimeString();
+    entry.innerHTML = `<span class="timestamp">[${time}]</span> ${message}`;
+    this._container.appendChild(entry);
+    this._container.scrollTop = this._container.scrollHeight;
+  }
+
+  clear() {
+    this._container.innerHTML = '';
+  }
+}
+customElements.define('log-viewer', LogViewer);
+</script>

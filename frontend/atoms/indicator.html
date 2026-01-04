@@ -1,0 +1,45 @@
+<!--
+KONOMI Atomic Design - Status Indicator Atom
+ISA-101 Level 1: Status LED display
+-->
+<template id="status-indicator">
+  <style>
+    .indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+    .indicator.online { background: #0f0; }
+    .indicator.offline { background: #f00; }
+    .indicator.warning { background: #ff0; }
+    .indicator.busy { background: #00f; animation: pulse 1s infinite; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  </style>
+  <span class="indicator offline"></span>
+</template>
+
+<script>
+class StatusIndicator extends HTMLElement {
+  static get observedAttributes() { return ['status']; }
+
+  constructor() {
+    super();
+    const template = document.getElementById('status-indicator');
+    const shadow = this.attachShadow({mode: 'open'});
+    shadow.appendChild(template.content.cloneNode(true));
+  }
+
+  attributeChangedCallback(name, oldVal, newVal) {
+    if (name === 'status') {
+      const indicator = this.shadowRoot.querySelector('.indicator');
+      indicator.className = `indicator ${newVal}`;
+    }
+  }
+}
+customElements.define('status-indicator', StatusIndicator);
+</script>

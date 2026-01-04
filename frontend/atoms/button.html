@@ -1,0 +1,41 @@
+<!--
+KONOMI Atomic Design - Button Atom
+ISA-101 Level 1: Basic interactive element
+-->
+<template id="xp-button">
+  <style>
+    .xp-button {
+      background: linear-gradient(to bottom, #fff 0%, #ECE9D8 100%);
+      border: 1px outset #fff;
+      padding: 5px 15px;
+      cursor: pointer;
+      font-size: 11px;
+      font-family: 'Tahoma', 'Verdana', sans-serif;
+    }
+    .xp-button:active {
+      border-style: inset;
+    }
+    .xp-button:hover {
+      background: linear-gradient(to bottom, #fff 0%, #d4d0c8 100%);
+    }
+    .xp-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
+  <button class="xp-button">
+    <slot></slot>
+  </button>
+</template>
+
+<script>
+class XPButton extends HTMLElement {
+  constructor() {
+    super();
+    const template = document.getElementById('xp-button');
+    const shadow = this.attachShadow({mode: 'open'});
+    shadow.appendChild(template.content.cloneNode(true));
+  }
+}
+customElements.define('xp-button', XPButton);
+</script>

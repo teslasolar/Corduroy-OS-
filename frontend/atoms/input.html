@@ -1,0 +1,57 @@
+<!--
+KONOMI Atomic Design - Input Atom
+ISA-101 Level 1: Text input field
+-->
+<template id="xp-input">
+  <style>
+    .xp-input {
+      border: 1px inset #ccc;
+      padding: 4px 6px;
+      font-size: 11px;
+      font-family: 'Tahoma', 'Verdana', sans-serif;
+      background: #fff;
+    }
+    .xp-input:focus {
+      outline: 1px solid #003CB3;
+    }
+    .xp-input.number {
+      width: 60px;
+      text-align: right;
+    }
+    label {
+      font-size: 11px;
+      margin-right: 5px;
+    }
+  </style>
+  <label><slot name="label"></slot></label>
+  <input type="text" class="xp-input">
+</template>
+
+<script>
+class XPInput extends HTMLElement {
+  static get observedAttributes() { return ['type', 'value', 'placeholder']; }
+
+  constructor() {
+    super();
+    const template = document.getElementById('xp-input');
+    const shadow = this.attachShadow({mode: 'open'});
+    shadow.appendChild(template.content.cloneNode(true));
+  }
+
+  get value() {
+    return this.shadowRoot.querySelector('input').value;
+  }
+
+  set value(v) {
+    this.shadowRoot.querySelector('input').value = v;
+  }
+
+  attributeChangedCallback(name, oldVal, newVal) {
+    const input = this.shadowRoot.querySelector('input');
+    if (name === 'type') input.type = newVal;
+    if (name === 'value') input.value = newVal;
+    if (name === 'placeholder') input.placeholder = newVal;
+  }
+}
+customElements.define('xp-input', XPInput);
+</script>

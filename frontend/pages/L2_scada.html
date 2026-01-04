@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Konomi - L2 SCADA View</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Tahoma', 'Verdana', sans-serif;
+            background: #5A7ECC;
+            color: #fff;
+            overflow: hidden;
+        }
+        #header {
+            background: linear-gradient(to right, #0054E3, #3985E8);
+            padding: 15px;
+            text-align: center;
+            border-bottom: 2px solid #003CB3;
+        }
+        h1 { font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .subtitle { font-size: 12px; opacity: 0.9; }
+
+        #container { display: flex; height: calc(100vh - 80px); margin: 10px; gap: 10px; }
+
+        .panel {
+            background: #ECE9D8;
+            border: 2px outset #fff;
+            padding: 10px;
+            color: #000;
+        }
+        .panel h3 {
+            color: #003CB3;
+            font-size: 12px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 4px;
+        }
+
+        #blocks-panel { width: 200px; overflow-y: auto; }
+        #main-view { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+        #cubes-panel { width: 200px; overflow-y: auto; }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            flex: 1;
+        }
+        .status-card {
+            background: #fff;
+            border: 1px inset #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        .status-card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #003CB3;
+        }
+        .status-card .label {
+            font-size: 10px;
+            color: #666;
+        }
+
+        #status-bar {
+            background: #D4D0C8;
+            padding: 5px 10px;
+            font-size: 11px;
+            color: #000;
+            border-top: 2px outset #fff;
+            display: flex;
+            justify-content: space-between;
+        }
+        .indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .online { background: #0f0; }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <h1>🖥️ L2 SCADA - Supervisory Control</h1>
+        <div class="subtitle">ISA-95 Level 2 | System Overview</div>
+    </div>
+
+    <div id="container">
+        <div class="panel" id="blocks-panel">
+            <h3>🧊 BlockArrays</h3>
+            <div id="blocks-list"></div>
+        </div>
+
+        <div id="main-view">
+            <div class="status-grid">
+                <div class="status-card">
+                    <div class="value" id="total-blocks">0</div>
+                    <div class="label">Active Blocks</div>
+                </div>
+                <div class="status-card">
+                    <div class="value" id="total-cubes">0</div>
+                    <div class="label">Active Cubes</div>
+                </div>
+                <div class="status-card">
+                    <div class="value" id="total-llms">0</div>
+                    <div class="label">LLM Instances</div>
+                </div>
+                <div class="status-card">
+                    <div class="value" id="total-cells">0</div>
+                    <div class="label">Active Cells</div>
+                </div>
+                <div class="status-card">
+                    <div class="value" id="memory-mb">0</div>
+                    <div class="label">Memory (MB)</div>
+                </div>
+                <div class="status-card">
+                    <div class="value" id="evgpu-status">CPU</div>
+                    <div class="label">eVGPU Platform</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel" id="cubes-panel">
+            <h3>🎲 Cubes</h3>
+            <div id="cubes-list"></div>
+        </div>
+    </div>
+
+    <div id="status-bar">
+        <span><span class="indicator online"></span>L2 SCADA Active</span>
+        <span>Konomi Corduroy-OS | ISA-95 Level 2</span>
+    </div>
+</body>
+</html>

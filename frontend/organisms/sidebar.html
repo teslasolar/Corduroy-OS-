@@ -1,0 +1,72 @@
+<!--
+KONOMI Atomic Design - Sidebar Organism
+ISA-101 Level 3: Complete control sidebar
+-->
+<template id="konomi-sidebar">
+  <style>
+    .sidebar {
+      width: 250px;
+      background: #ECE9D8;
+      border: 2px outset #fff;
+      padding: 10px;
+      color: #000;
+      overflow-y: auto;
+      font-family: 'Tahoma', 'Verdana', sans-serif;
+    }
+    .section {
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+    .section h3 {
+      font-size: 14px;
+      color: #003CB3;
+      margin-bottom: 8px;
+    }
+    button {
+      background: linear-gradient(to bottom, #fff 0%, #ECE9D8 100%);
+      border: 1px outset #fff;
+      padding: 5px 15px;
+      cursor: pointer;
+      margin: 2px;
+      font-size: 11px;
+    }
+    button:active { border-style: inset; }
+    button:hover { background: linear-gradient(to bottom, #fff 0%, #d4d0c8 100%); }
+  </style>
+
+  <div class="sidebar">
+    <div class="section">
+      <h3>🎲 Cube Control</h3>
+      <slot name="cube-controls"></slot>
+    </div>
+    <div class="section">
+      <h3>🧊 BlockArray</h3>
+      <slot name="block-controls"></slot>
+    </div>
+    <div class="section">
+      <h3>⚡ eVGPU</h3>
+      <slot name="evgpu-controls"></slot>
+    </div>
+    <div class="section">
+      <h3>🖥️ v86 VM</h3>
+      <slot name="vm-controls"></slot>
+    </div>
+    <div class="section">
+      <h3>📊 System Log</h3>
+      <slot name="log"></slot>
+    </div>
+  </div>
+</template>
+
+<script>
+class KonomiSidebar extends HTMLElement {
+  constructor() {
+    super();
+    const template = document.getElementById('konomi-sidebar');
+    const shadow = this.attachShadow({mode: 'open'});
+    shadow.appendChild(template.content.cloneNode(true));
+  }
+}
+customElements.define('konomi-sidebar', KonomiSidebar);
+</script>

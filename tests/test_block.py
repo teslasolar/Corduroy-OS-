@@ -32,7 +32,7 @@ class TestBlock:
 
     def test_set_out_of_bounds(self):
         """Test setting out of bounds raises error."""
-        with pytest.raises(ValueError, match="Out of bounds"):
+        with pytest.raises(ValueError, match="out of bounds"):
             self.block.set(100, 100, 100, 1.0)
 
     def test_sparse_storage(self):
@@ -77,16 +77,16 @@ class TestBlock:
 
     def test_clear_region(self):
         """Test clearing a region."""
-        # Set values in region
+        # Set values in region (note: 0.0 is not stored due to sparse)
         for i in range(5):
-            self.block.set(i, i, i, float(i))
+            self.block.set(i, i, i, float(i + 1))  # +1 so all non-zero
 
         # Clear region (0,0,0) to (2,2,2)
         cleared = self.block.clear_region((0, 2), (0, 2), (0, 2))
 
         assert cleared == 3  # 0,0,0 and 1,1,1 and 2,2,2
-        assert self.block.get(0, 0, 0) == 0.0
-        assert self.block.get(3, 3, 3) == 3.0  # Outside region
+        assert self.block.get(0, 0, 0) == 0.0  # Cleared
+        assert self.block.get(3, 3, 3) == 4.0  # Outside region, was i+1=4
 
     def test_query_region(self):
         """Test querying a region."""

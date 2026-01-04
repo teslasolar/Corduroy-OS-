@@ -1,0 +1,10 @@
+UDT: BlockMetadata
+---
+dims: (100, 100, 100)
+capacity: 1000000
+active_cells: 42
+active_llms: 3
+active_cubes: 1
+---
+Created: 2026-01-04
+Description: Example block with 100³ grid

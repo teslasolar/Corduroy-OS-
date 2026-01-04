@@ -1,0 +1,73 @@
+<!--
+KONOMI Atomic Design - VM Screen Organism
+ISA-101 Level 3: v86 virtual machine display
+-->
+<template id="vm-screen">
+  <style>
+    .vm-container {
+      flex: 1;
+      background: #fff;
+      border: 2px inset #ccc;
+      position: relative;
+    }
+    .vm-screen {
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0f0;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+    }
+    .vm-placeholder {
+      text-align: center;
+    }
+    .vm-placeholder h2 { margin-bottom: 10px; }
+    .vm-placeholder p { margin: 5px 0; }
+    .vm-placeholder .subtitle { font-size: 12px; }
+    .vm-placeholder .small { font-size: 10px; opacity: 0.7; }
+    #v86-canvas {
+      width: 100%;
+      height: 100%;
+      display: none;
+    }
+    .vm-screen.running #v86-canvas { display: block; }
+    .vm-screen.running .vm-placeholder { display: none; }
+  </style>
+
+  <div class="vm-container">
+    <div class="vm-screen">
+      <div class="vm-placeholder">
+        <h2>🪟 Konomi Corduroy-OS XP10</h2>
+        <p class="subtitle">v86 Virtual Machine</p>
+        <p>Click "Boot XP10" to start</p>
+        <p class="small">Custom NT kernel | Luna theme</p>
+      </div>
+      <canvas id="v86-canvas"></canvas>
+    </div>
+  </div>
+</template>
+
+<script>
+class VMScreen extends HTMLElement {
+  constructor() {
+    super();
+    const template = document.getElementById('vm-screen');
+    const shadow = this.attachShadow({mode: 'open'});
+    shadow.appendChild(template.content.cloneNode(true));
+  }
+
+  boot() {
+    const screen = this.shadowRoot.querySelector('.vm-screen');
+    screen.classList.add('running');
+    this.dispatchEvent(new CustomEvent('boot'));
+  }
+
+  getCanvas() {
+    return this.shadowRoot.getElementById('v86-canvas');
+  }
+}
+customElements.define('vm-screen', VMScreen);
+</script>

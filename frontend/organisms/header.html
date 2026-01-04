@@ -1,0 +1,45 @@
+<!--
+KONOMI Atomic Design - Header Organism
+ISA-101 Level 3: Top header bar
+-->
+<template id="konomi-header">
+  <style>
+    .header {
+      background: linear-gradient(to right, #0054E3, #3985E8);
+      padding: 20px;
+      text-align: center;
+      border-bottom: 2px solid #003CB3;
+      color: #fff;
+      font-family: 'Tahoma', 'Verdana', sans-serif;
+    }
+    h1 {
+      font-size: 32px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      margin: 0;
+    }
+    .subtitle {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-top: 5px;
+    }
+  </style>
+
+  <div class="header">
+    <h1>🪟 <slot name="title">Konomi Corduroy-OS</slot></h1>
+    <div class="subtitle">
+      <slot name="subtitle">XP10 Hybrid Interface | v86 Virtual Machine</slot>
+    </div>
+  </div>
+</template>
+
+<script>
+class KonomiHeader extends HTMLElement {
+  constructor() {
+    super();
+    const template = document.getElementById('konomi-header');
+    const shadow = this.attachShadow({mode: 'open'});
+    shadow.appendChild(template.content.cloneNode(true));
+  }
+}
+customElements.define('konomi-header', KonomiHeader);
+</script>

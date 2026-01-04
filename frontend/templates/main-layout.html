@@ -1,0 +1,69 @@
+<!--
+KONOMI Atomic Design - Main Layout Template
+ISA-101 Level 4: Overall page layout
+-->
+<template id="main-layout">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    .layout {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Tahoma', 'Verdana', sans-serif;
+      background: #5A7ECC;
+    }
+    .header-slot {
+      flex-shrink: 0;
+    }
+    .content {
+      display: flex;
+      flex: 1;
+      margin: 10px;
+      gap: 10px;
+      overflow: hidden;
+    }
+    .sidebar-slot {
+      flex-shrink: 0;
+    }
+    .main-slot {
+      flex: 1;
+    }
+    .status-slot {
+      flex-shrink: 0;
+    }
+  </style>
+
+  <div class="layout">
+    <div class="header-slot">
+      <slot name="header"></slot>
+    </div>
+    <div class="content">
+      <div class="sidebar-slot">
+        <slot name="sidebar"></slot>
+      </div>
+      <div class="main-slot">
+        <slot name="main"></slot>
+      </div>
+    </div>
+    <div class="status-slot">
+      <slot name="status"></slot>
+    </div>
+  </div>
+</template>
+
+<script>
+class MainLayout extends HTMLElement {
+  constructor() {
+    super();
+    const template = document.getElementById('main-layout');
+    const shadow = this.attachShadow({mode: 'open'});
+    shadow.appendChild(template.content.cloneNode(true));
+  }
+}
+customElements.define('main-layout', MainLayout);
+</script>

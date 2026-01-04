@@ -1,0 +1,59 @@
+<!--
+KONOMI Atomic Design - Coordinate Input Molecule
+ISA-101 Level 2: X/Y/Z coordinate inputs
+-->
+<template id="coord-input">
+  <style>
+    .coord-container {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .coord-label {
+      font-size: 10px;
+      font-weight: bold;
+      width: 15px;
+    }
+    .coord-field {
+      border: 1px inset #ccc;
+      padding: 2px 4px;
+      width: 50px;
+      text-align: right;
+      font-size: 11px;
+    }
+  </style>
+  <div class="coord-container">
+    <span class="coord-label">X:</span>
+    <input type="number" class="coord-field" id="x" value="0">
+    <span class="coord-label">Y:</span>
+    <input type="number" class="coord-field" id="y" value="0">
+    <span class="coord-label">Z:</span>
+    <input type="number" class="coord-field" id="z" value="0">
+  </div>
+</template>
+
+<script>
+class CoordInput extends HTMLElement {
+  constructor() {
+    super();
+    const template = document.getElementById('coord-input');
+    const shadow = this.attachShadow({mode: 'open'});
+    shadow.appendChild(template.content.cloneNode(true));
+  }
+
+  get value() {
+    return {
+      x: parseInt(this.shadowRoot.getElementById('x').value) || 0,
+      y: parseInt(this.shadowRoot.getElementById('y').value) || 0,
+      z: parseInt(this.shadowRoot.getElementById('z').value) || 0
+    };
+  }
+
+  set value(coord) {
+    this.shadowRoot.getElementById('x').value = coord.x || 0;
+    this.shadowRoot.getElementById('y').value = coord.y || 0;
+    this.shadowRoot.getElementById('z').value = coord.z || 0;
+  }
+}
+customElements.define('coord-input', CoordInput);
+</script>

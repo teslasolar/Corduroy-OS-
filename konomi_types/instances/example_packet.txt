@@ -1,0 +1,9 @@
+UDT: PacketHeader
+---
+opcode: 0x11
+payload_len: 256
+seq: 1
+crc: 0xABCD
+flags: 0x00
+---
+Description: LLM_QUERY packet with 256-byte payload
